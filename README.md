@@ -1,6 +1,6 @@
 # Mulesoft-Connector-Documentation
 
-## This is the repository for the Thru Mulesoft Connector Documentation. This Repository is Public.
+## This is the repository for the Thru Mulesoft Connector Documentation.
 
 You must include:
 
