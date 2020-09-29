@@ -1,19 +1,8 @@
-////
-The following is the approved connector user guide template for documenting MuleSoft Supported Connectors.
-////
-
 = Thru Managed File Transfer (MFT) Connector for MuleSoft
 :keywords: Thru, MFT, MFTaaS, OptiPaaS
 :imagesdir: ./_images
 :toc: macro
 :toclevels: 2
-////
-Image names follow "image:". Identify images using the connector name, preferably without the word "connector"
-URLs should always follow "link:"
-////
-
-// Dropdown for Connector Version
-//  Children: Technical Reference / Demos
 
 toc::[]
 
@@ -34,8 +23,6 @@ Thru MFT Connector for MuleSoft Anypoint Studio and Thru MFT cloud service allow
 - Separation of data processing in Mule Flows from file exchange with organizations via Thru MFT
 - Unified connector API for pickup, drop-off and exception handling, independent of partner endpoint type and method/protocol. Endpoints are managed in Thru MFT service and are invisible to Mule Flows.
 - Subscription model instead of addressing.
-
-
 
 Read through this user guide to understand how to set up and configure a basic file transfer using Thru MFT connector. Track feature additions, compatibility, limitations, and API version updates with each release of the connector using the link:release-notes.adoc[Connector Release Notes].
 Review the <<operations,Connector Operations>> section and notes on demo Flows in the link:https://github.com/ThruInc/muleconnector2.0/blob/release/2.0.0/demo/mft-demo-1.0/README.md[Demo Applications description].
@@ -99,69 +86,9 @@ If you’re currently using an older version of the connector, a small popup app
 
 Additionally, we recommend that you keep Studio up to date with its latest version.
 
-////
-[[ns-schema]]
-== Connector Namespace and Schema
 
-When designing your application in Anypoint Studio, when you drag the connector from the palette onto the Anypoint Studio canvas, Studio automatically populates the XML code with the connector *namespace* and *schema location*.
-
-*Namespace:* `+http://www.mulesoft.org/schema/mule/connector+` +
-*Schema Location:* `+http://www.mulesoft.org/schema/mule/connector/current/mule-connector.xsd+`
-
-[TIP]
-If you are manually coding the Mule application in Studio's XML editor or another text editor, define the namespace and schema location in the header of your *Configuration XML*, inside the `<mule>` tag.
-
-[source, xml,linenums]
-----
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:connector="http://www.mulesoft.org/schema/mule/connector"
-      xsi:schemaLocation="
-               http://www.mulesoft.org/schema/mule/core
-               http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-               http://www.mulesoft.org/schema/mule/connector
-               http://www.mulesoft.org/schema/mule/connector/current/mule-connector.xsd">
-
-      <!-- put your global configuration elements and flows here -->
-
-</mule>
-----
-
-*Note:* Use `current` in the schema path. Studio interprets this to the current Mule version.
-////
-
-////
-[[maven]]
-== Maven Dependency Information
-
-For Maven dependency management, include this XML snippet in your `pom.xml` file.
-
-[source,xml,linenums]
-----
-<dependency>
-  <groupId></groupId>
-  <artifactId></artifactId>
-  <version></version>
-</dependency>
-----
-
-[TIP]
-====
-Inside the `<version>` tags, put the desired version number, the word `RELEASE` for the latest release, or `SNAPSHOT` for the latest available version. The available versions are:
-
-* *x.y.z*
-====
-////
-
-[[configure]]
-== How to Configure
-
-Place Thru MFT connector in your Flow as applicable for your use case.
-
-To use the Thru MFT connector in Mule application flow, you must configure the Global Element Properties (XML tag <thru-transport>) per each Flow. Global element properties will be used by Thru MFT connector instances running in the Flow and are used for authorization purposes to communicate with selected instance of Thru MFT service and selected Transport in that service instance.
-////
 (read more about  link:https://docs.mulesoft.com/mule-user-guide/v/3.8/global-elements[Global Elements]).
-////
+
 
 Thru MFT connector provides the following global Element properties for each Flow:
 
@@ -192,17 +119,13 @@ The connector supports the following list of operations:
 
 image:ThruConnectorOperations.png[List of Thru MFT connector operations]
 
-
-
 *File Pickup* :  Download (pickup) file from a linked Thru MFT Transport and pass to Mule Flow. Polling is used and polling frequency can be set. Streaming method is used, no limits on file size.
-
 
 image:FilePickup.png[File Pickup]
 
+*Set Variable* : Need description and explanation of Set Variable.
 
-*FileDropoff*  Upload (Drop-off) a file from Mule Flow to a linked Transport in Thru MFT. File is uploaded by chunks and size is not limited. File payload, Name and Size should be provided in the message. If outgoing file is a result of processing of incoming file (e.g. exceptions in the data), file code of original file should be provided.
-
-image:FileDropOff.png[File Dropoff]
+image:SetVariable.png[Set Variable]
 
 *Flow Outcome* Passes resulting status of the Flow to Thru MFT service, where it can be viewed in dashboards by the administrators. Mule Flow result :  1-passed, 2-failed, 3-mixed. Mixed cases may happen in the batch processing when some records generate exceptions. In case of batch processing Flow Outcome may optionally return notes on the Flow outcome, ID of Mule message, counters of total and Failed records.
 
@@ -210,69 +133,15 @@ Simple Flow Outcome:
 
 image:FlowOutcome-simple.png[Simple Flow Outcome]
 
-Batch Flow Outcome:
+*FileDropoff*  Upload (Drop-off) a file from Mule Flow to a linked Transport in Thru MFT. File is uploaded by chunks and size is not limited. File payload, Name and Size should be provided in the message. If outgoing file is a result of processing of incoming file (e.g. exceptions in the data), file code of original file should be provided.
 
-image:BatchFlowOutcome.png[Batch Flow Outcome]
+image:FileDropOff.png[File Dropoff]
 
-*Batch Exception Handler* This API can return exception information from batch processing. Information can include exception messages and records which caused exceptions. Composition of returned information is defined by Mule Flow developer. Information is passed to Thru MFT transport linked to the Mule Flow, is stored in Thru MFT metadata database and available for review in dashboards by administrators. Size of the returned exception metadata is limited to 10MB per call. In case if records which failed processing should be passed back to the Organization that sent the data, best practice is to provide limited exception information in this call and fill list of exception records in exception file for File DropOff call.
+*File Metadata* Thru File Metadata database is available for review in dashboards by administrators. Size of the returned exception metadata is limited to 10MB per call.
 
-image:BatchExceptionHandler.png[Batch Exception Handler]
-
-
+image:FileMetadata.png[File Metadata]
 
 *FileMetadata* The API call returns various metadata about Transport, Organization and File which participate in file transfer.
-
-////
-
-== Common Use Cases
-
-Explain the common and less intuitive use cases and provide links to them in the bullets.
-//These may include an example app that can be deployed in Mule or links to Exchange
-
-* link:#use-case-1[Configure Connector to ...]
-* link:#use-case-2[Configure Authentication via ...]
-
-
-[use-case-1]
-=== Configure Connector to ...
-
-// Limit to 10 steps
-// Do NOT provide a parallel XML walkthrough. Weave any XML details into steps. Also avoid any unnecessary or marginally helpful screenshots
-
-Explain the use case and provide a complete working example if possible.
-
-The section should contain a fully functional Mule application as a demo, where the use case is considered. Explain how to create this case with the Anypoint Studio Visual editor and list the app.
-
-Download the deployable app archive and import into Anypoint Studio to interact with the example application.
-
-//[use-case-2]
-//=== Configure Authentication Using ...
-
-////
-
-== Connector Performance
-
-To define the pooling profile for the connector manually, access the *Pooling Profile* tab in the applicable global element for the connector.
-
-For background information on pooling, see link:https://docs.mulesoft.com/mule-user-guide/v/3.9/tuning-performance[Tuning Performance].
-
-////
-=== Integration Patterns
-optional
-___ recognizes these integration patterns for connecting with other systems…
-////
-
-////
-=== Best Practices
-optional
-To take full advantage of the functionality … +
-////
-
-////
-=== Tips
-optional
-* <Information from Support>
-////
 
 == Resources
 

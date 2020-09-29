@@ -1,0 +1,373 @@
+:toc:               left
+:toc-title:         MFT Connector
+:toclevels:         2
+:last-update-label!:
+:docinfo:
+:source-highlighter: coderay
+:icons: font
+
+
+= MFT Connector Documentation Reference
+
++++
+This is the main class of an extension, is the entry point from which configurations, connection providers, operations and sources are going to be declared.
++++
+
+
+== Configurations
+---
+[[config]]
+=== Config
+
++++
+Default configuration
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+|Name | String | The name for this configuration. Connectors reference the configuration with this name. | | *x*{nbsp}
+| Connection a| <<config_mft-connection, MFT Connection>>
+ | The connection types that can be provided to this configuration. | | *x*{nbsp}
+| Expiration Policy a| <<ExpirationPolicy>> |  +++Configures the minimum amount of time that a dynamic configuration instance can remain idle before the runtime considers it eligible for expiration. This does not mean that the platform will expire the instance at the exact moment that it becomes eligible. The runtime will actually purge the instances when it sees it fit.+++ |  | {nbsp}
+|======================
+
+==== Connection Types
+[[config_mft-connection]]
+===== MFT Connection
+
+
+====== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| API Url a| String |  +++Thru API server address responsible for connector operations. This is the URL for the endpoint that is configured to handle connector requests.+++ |  | *x*{nbsp}
+| StorageRepository a| String |  +++Specify the Thru server endpoint.+++ |  | *x*{nbsp}
+| Site Key a| String |  +++Thru site access key.+++ |  | *x*{nbsp}
+| Flow Secret a| String |  +++Your flow's secret key+++ |  | *x*{nbsp}
+| Connection Timeout a| Number |  +++The connection timeout in ms+++ |  | *x*{nbsp}
+| Enable Simulation Mode a| Boolean |  +++Enables simulation data to be used.  Real files from a transport will not be used.+++ |  +++false+++ | {nbsp}
+| Host a| String |  +++Proxy host URL+++ |  | {nbsp}
+| Port a| Number |  +++Proxy host port+++ |  | {nbsp}
+| Username a| String |  +++Proxy username.  Needed only if proxy authentication is required.+++ |  | {nbsp}
+| Password a| String |  +++Proxy password.  Needed only if proxy authentication is required.+++ |  | {nbsp}
+| Reconnection a| <<Reconnection>> |  +++When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy+++ |  | {nbsp}
+|======================
+
+==== Associated Operations
+* <<Flow-Outcome>> {nbsp}
+* <<file-dropoff>> {nbsp}
+* <<file-metadata>> {nbsp}
+
+==== Associated Sources
+* <<file-pickup-source>> {nbsp}
+
+
+== Operations
+
+[[Flow-Outcome]]
+=== Flow Outcome
+`<mft:flow-outcome>`
+
++++
+Send outcome information for a file with flow execution result status
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| File Code a| String |  +++A unique Thru id of the file.+++ |  | *x*{nbsp}
+| Status a| Enumeration, one of:
+
+** PASSED
+** FAILED
+** MIXED_RESULT |  +++Outcome status (1 - PASSED, 2 - FAILED, 3 - MIXED_RESULT)+++ |  | *x*{nbsp}
+| Flow Instance Code a| String |  +++A unique id of mule message or mule operation+++ |  | *x*{nbsp}
+| Reconnection Strategy a| * <<reconnect>>
+* <<reconnect-forever>> |  +++A retry strategy in case of connectivity errors+++ |  | {nbsp}
+|======================
+
+
+==== For Configurations.
+* <<config>> {nbsp}
+
+==== Throws
+* MFT:INVALID_AUTH_CREDENTIALS {nbsp}
+* MFT:UNABLE_TO_PICKUP {nbsp}
+* MFT:UNABLE_TO_CONNECT {nbsp}
+* MFT:CONNECTIVITY {nbsp}
+* MFT:UNKNOWN_SERVER {nbsp}
+* MFT:INVALID_PARAMETER {nbsp}
+* MFT:TIMEOUT {nbsp}
+* MFT:RETRY_EXHAUSTED {nbsp}
+* MFT:ENTITY_NOT_FOUND {nbsp}
+* MFT:PICKUP_INVALID_FILE_NAME {nbsp}
+* MFT:UNABLE_BUILD_AUTH_HEADER {nbsp}
+* MFT:UNKNOWN_CLIENT {nbsp}
+
+
+[[file-dropoff]]
+=== File Dropoff
+`<mft:file-dropoff>`
+
++++
+Upload file to Thru server.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| File Data a| Binary |  +++File to be uploaded.+++ |  +++#[payload]+++ | {nbsp}
+| Filename a| String |  +++Name of the file. If file not present in filename it will be automatically retrieved from Thru server and added to the filename.+++ |  | *x*{nbsp}
+| Related Pickup File Code a| String |  +++A unique Thru id of the file. if empty will be generated automatically.+++ |  ++++++ | {nbsp}
+| File Size a| Number |  +++Size of the file.+++ |  | *x*{nbsp}
+| Streaming Strategy a| * <<repeatable-in-memory-stream>>
+* <<repeatable-file-store-stream>>
+* <<non-repeatable-stream>> |  +++Configure if repeatable streams should be used and their behaviour+++ |  | {nbsp}
+| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
+| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
+| Reconnection Strategy a| * <<reconnect>>
+* <<reconnect-forever>> |  +++A retry strategy in case of connectivity errors+++ |  | {nbsp}
+|======================
+
+==== Output
+[cols=".^50%,.^50%"]
+|======================
+| *Type* a| Binary
+| *Attributes Type* a| <<MFTFileAttributes>>
+|======================
+
+==== For Configurations.
+* <<config>> {nbsp}
+
+==== Throws
+* MFT:INVALID_AUTH_CREDENTIALS {nbsp}
+* MFT:UNABLE_TO_PICKUP {nbsp}
+* MFT:UNABLE_TO_CONNECT {nbsp}
+* MFT:CONNECTIVITY {nbsp}
+* MFT:UNKNOWN_SERVER {nbsp}
+* MFT:INVALID_PARAMETER {nbsp}
+* MFT:TIMEOUT {nbsp}
+* MFT:RETRY_EXHAUSTED {nbsp}
+* MFT:ENTITY_NOT_FOUND {nbsp}
+* MFT:PICKUP_INVALID_FILE_NAME {nbsp}
+* MFT:UNABLE_BUILD_AUTH_HEADER {nbsp}
+* MFT:UNKNOWN_CLIENT {nbsp}
+
+
+[[file-metadata]]
+=== File Metadata
+`<mft:file-metadata>`
+
++++
+Requests the file's information.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| File Code a| String |  +++A unique Thru id of the file.+++ |  | *x*{nbsp}
+| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
+| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
+| Reconnection Strategy a| * <<reconnect>>
+* <<reconnect-forever>> |  +++A retry strategy in case of connectivity errors+++ |  | {nbsp}
+|======================
+
+==== Output
+[cols=".^50%,.^50%"]
+|======================
+| *Type* a| <<MFTFileMetadata>>
+|======================
+
+==== For Configurations.
+* <<config>> {nbsp}
+
+==== Throws
+* MFT:INVALID_AUTH_CREDENTIALS {nbsp}
+* MFT:UNABLE_TO_PICKUP {nbsp}
+* MFT:UNABLE_TO_CONNECT {nbsp}
+* MFT:CONNECTIVITY {nbsp}
+* MFT:UNKNOWN_SERVER {nbsp}
+* MFT:INVALID_PARAMETER {nbsp}
+* MFT:TIMEOUT {nbsp}
+* MFT:RETRY_EXHAUSTED {nbsp}
+* MFT:ENTITY_NOT_FOUND {nbsp}
+* MFT:PICKUP_INVALID_FILE_NAME {nbsp}
+* MFT:UNABLE_BUILD_AUTH_HEADER {nbsp}
+* MFT:UNKNOWN_CLIENT {nbsp}
+
+
+== Sources
+
+[[file-pickup-source]]
+=== On File Pickup Source
+`<mft:file-pickup-source>`
+
++++
+Download file from Thru server.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| Output Mime Type a| String |  +++The mime type of the payload that this operation outputs.+++ |  | {nbsp}
+| Output Encoding a| String |  +++The encoding of the payload that this operation outputs.+++ |  | {nbsp}
+| Primary Node Only a| Boolean |  +++Whether this source should only be executed on the primary node when runnning in Cluster+++ |  | {nbsp}
+| Scheduling Strategy a| <<scheduling-strategy>> |  +++Configures the scheduler that triggers the polling+++ |  | *x*{nbsp}
+| Streaming Strategy a| * <<repeatable-in-memory-stream>>
+* <<repeatable-file-store-stream>>
+* <<non-repeatable-stream>> |  +++Configure if repeatable streams should be used and their behaviour+++ |  | {nbsp}
+| Redelivery Policy a| <<RedeliveryPolicy>> |  +++Defines a policy for processing the redelivery of the same message+++ |  | {nbsp}
+| Reconnection Strategy a| * <<reconnect>>
+* <<reconnect-forever>> |  +++A retry strategy in case of connectivity errors+++ |  | {nbsp}
+|======================
+
+==== Output
+[cols=".^50%,.^50%"]
+|======================
+| *Type* a| Binary
+| *Attributes Type* a| <<MFTFileAttributes>>
+|======================
+
+==== For Configurations.
+* <<config>> {nbsp}
+
+
+
+== Types
+[[Reconnection]]
+=== Reconnection
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Fails Deployment a| Boolean | When the application is deployed, a connectivity test is performed on all connectors. If set to true, deployment will fail if the test doesn't pass after exhausting the associated reconnection strategy |  | 
+| Reconnection Strategy a| * <<reconnect>>
+* <<reconnect-forever>> | The reconnection strategy to use |  | 
+|======================
+
+[[reconnect]]
+=== Reconnect
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Frequency a| Number | How often (in ms) to reconnect |  | 
+| Count a| Number | How many reconnection attempts to make |  | 
+|======================
+
+[[reconnect-forever]]
+=== Reconnect Forever
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Frequency a| Number | How often (in ms) to reconnect |  | 
+|======================
+
+[[ExpirationPolicy]]
+=== Expiration Policy
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Max Idle Time a| Number | A scalar time value for the maximum amount of time a dynamic configuration instance should be allowed to be idle before it's considered eligible for expiration |  | 
+| Time Unit a| Enumeration, one of:
+
+** NANOSECONDS
+** MICROSECONDS
+** MILLISECONDS
+** SECONDS
+** MINUTES
+** HOURS
+** DAYS | A time unit that qualifies the maxIdleTime attribute |  | 
+|======================
+
+[[MFTFileAttributes]]
+=== MFT File Attributes
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| File Code a| String |  |  | 
+| File Name a| String |  |  | 
+| File Size a| Number |  |  | 
+|======================
+
+[[repeatable-in-memory-stream]]
+=== Repeatable In Memory Stream
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Initial Buffer Size a| Number | This is the amount of memory that will be allocated in order to consume the stream and provide random access to it. If the stream contains more data than can be fit into this buffer, then it will be expanded by according to the bufferSizeIncrement attribute, with an upper limit of maxInMemorySize. |  | 
+| Buffer Size Increment a| Number | This is by how much will be buffer size by expanded if it exceeds its initial size. Setting a value of zero or lower will mean that the buffer should not expand, meaning that a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised when the buffer gets full. |  | 
+| Max Buffer Size a| Number | This is the maximum amount of memory that will be used. If more than that is used then a STREAM_MAXIMUM_SIZE_EXCEEDED error will be raised. A value lower or equal to zero means no limit. |  | 
+| Buffer Unit a| Enumeration, one of:
+
+** BYTE
+** KB
+** MB
+** GB | The unit in which all these attributes are expressed |  | 
+|======================
+
+[[repeatable-file-store-stream]]
+=== Repeatable File Store Stream
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| In Memory Size a| Number | Defines the maximum memory that the stream should use to keep data in memory. If more than that is consumed then it will start to buffer the content on disk. |  | 
+| Buffer Unit a| Enumeration, one of:
+
+** BYTE
+** KB
+** MB
+** GB | The unit in which maxInMemorySize is expressed |  | 
+|======================
+
+[[RedeliveryPolicy]]
+=== Redelivery Policy
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Max Redelivery Count a| Number | The maximum number of times a message can be redelivered and processed unsuccessfully before triggering process-failed-message |  | 
+| Use Secure Hash a| Boolean | Whether to use a secure hash algorithm to identify a redelivered message |  | 
+| Message Digest Algorithm a| String | The secure hashing algorithm to use. If not set, the default is SHA-256. |  | 
+| Id Expression a| String | Defines one or more expressions to use to determine when a message has been redelivered. This property may only be set if useSecureHash is false. |  | 
+| Object Store a| <<ObjectStore>> | The object store where the redelivery counter for each message is going to be stored. |  | 
+|======================
+
+[[MFTFileMetadata]]
+=== MFT File Metadata
+
+[cols=".^20%,.^25%,.^30%,.^15%,.^10%", options="header"]
+|======================
+| Field | Type | Description | Default Value | Required
+| Date Created a| String |  |  | 
+| File Code a| String |  |  | 
+| File Name a| String |  |  | 
+| File Processing Type a| Number |  |  | 
+| File Processing Type Display a| String |  |  | 
+| File Size a| Number |  |  | 
+| File Status a| Number |  |  | 
+| File Status Display a| String |  |  | 
+| Participant Code a| String |  |  | 
+| Participant External Code a| String |  |  | 
+| Participant Name a| String |  |  | 
+| Participant Type a| Number |  |  | 
+| Participant Type Display a| String |  |  | 
+| Related File Code a| String |  |  | 
+| Related File Name a| String |  |  | 
+|======================
+
