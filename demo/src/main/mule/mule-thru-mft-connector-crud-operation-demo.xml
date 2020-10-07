@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:mft="http://www.mulesoft.org/schema/mule/mft"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mft http://www.mulesoft.org/schema/mule/mft/current/mule-mft.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+
+	<configuration-properties file="mule-thru-demo.properties" doc:name="Configuration properties"/>
+
+	<mft:config name="MFT_Source_Config" doc:name="MFT Config" doc:id="084ee2d5-88ed-4ec9-9281-c891883d3af8" >
+		<mft:mft-connection APIUrl="${apiUrl}" StorageRepository="${storageRepository}" SiteKey="${siteKey}" FlowSecret="${flowSecret}" Timeout="${defaultTimeout}" />
+	</mft:config>
+	<mft:config name="MFT_Target_Config" doc:name="MFT Config" doc:id="fd5516a3-395e-4c90-8148-0ff048a1cf87" >
+		<mft:mft-connection APIUrl="${apiUrl-target}" StorageRepository="${storageRepository-target}" SiteKey="${siteKey-target}" FlowSecret="${flowSecret-target}" Timeout="${defaultTimeout}" />
+	</mft:config>
+	<flow name="mule-thru-mft-connector-crud-operation-demoFlow" doc:id="724de966-58b7-49a6-a2cf-e1aaacac61ea" initialState="started">
+		<mft:file-pickup-source doc:name="On [File Pickup Source]" doc:id="38a9e517-0415-4586-a8f6-a1317a420100" config-ref="MFT_Source_Config">
+			<scheduling-strategy >
+				<fixed-frequency frequency="3000" />
+			</scheduling-strategy>
+		</mft:file-pickup-source>
+		<set-variable value="#[attributes.fileCode]" doc:name="Set Variable" doc:id="e2a397de-ad70-4a97-95b5-be682bca67c8" variableName="fileCode"/>
+		<mft:file-dropoff fileSize="#[attributes.fileSize]" doc:name="File Dropoff" doc:id="68ba4cf9-1301-4c44-9c07-fd0ac0b8279d" config-ref="MFT_Target_Config" filename="#[attributes.fileName]" />
+		<ee:transform doc:name="Transform Message" doc:id="e7f5f252-6a20-4a9e-9683-b8d96b5fe594">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	fileCodeDropoff: attributes.fileCode
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6ebcb362-a873-4433-8531-b14c12134a40" message="&gt;&gt;&gt;&gt; DATAWEAVE - File Dropoff fileCode: #[payload.fileCodeDropoff]" />
+		<mft:file-metadata doc:name="File Metadata" doc:id="9f016500-3fdf-4cb0-bf4d-bb76c5058390" config-ref="MFT_Source_Config" fileCode="#[vars.fileCode]"/>
+		<ee:transform doc:name="Transform Message" doc:id="847bcb36-262f-4e6f-b475-6de764ee135d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	userName: "thruSupport",
+	fileName: payload.fileName,
+	fileCode: payload.fileCode,
+	fileSize: payload.fileSize,
+	fileDate: payload.dateCreated
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="82d1637d-790d-4bfc-a312-20374f2fa2d7" message="&gt;&gt;&gt;&gt; DATAWEAVE -  Current user: #[payload.userName], fileName: #[payload.fileName], fileSize: #[payload.fileSize], fileCode: #[payload.fileCode], date: #[payload.fileDate]"/>
+		<mft:flow-outcome doc:name="Flow Outcome" doc:id="0a03cb45-5f4b-4e9a-8097-aa9da6e36827" config-ref="MFT_Source_Config" fileCode="#[vars.fileCode]" status="PASSED" flowInstanceCode="#[vars.fileCode]" />
+	</flow>
+</mule>

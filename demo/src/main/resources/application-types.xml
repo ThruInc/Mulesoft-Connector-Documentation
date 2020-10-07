@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="Metadata-Transform-Output" format="java">
+      <types:shape format="java" element="org.mule.modules.thrutctransport.api.MFTFileMetadata"/>
+    </types:type>
+  </types:catalog>
+</types:mule>
