@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:mft="http://www.mulesoft.org/schema/mule/mft"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:compression="http://www.mulesoft.org/schema/mule/compression"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:mft="http://www.mulesoft.org/schema/mule/mft" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/mft http://www.mulesoft.org/schema/mule/mft/current/mule-mft.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/compression http://www.mulesoft.org/schema/mule/compression/current/mule-compression.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
 
 	<configuration-properties file="mule-thru-demo.properties" doc:name="Configuration properties"/>
 
@@ -14,14 +17,37 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	<mft:config name="MFT_Target_Config" doc:name="MFT Config" doc:id="fd5516a3-395e-4c90-8148-0ff048a1cf87" >
 		<mft:mft-connection APIUrl="${apiUrl-target}" StorageRepository="${storageRepository-target}" SiteKey="${siteKey-target}" FlowSecret="${flowSecret-target}" Timeout="${defaultTimeout}" />
 	</mft:config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="b3e98bb1-343f-45b2-82ac-f627277e0739">
+		<http:request-connection protocol="HTTPS" host="mftdevapi0011.thruinc.com">
+		</http:request-connection>
+	</http:request-config>
 	<flow name="mule-thru-mft-connector-crud-operation-demoFlow" doc:id="724de966-58b7-49a6-a2cf-e1aaacac61ea" initialState="started">
-		<mft:file-pickup-source doc:name="On [File Pickup Source]" doc:id="38a9e517-0415-4586-a8f6-a1317a420100" config-ref="MFT_Source_Config">
+		<mft:file-pickup-source doc:name="On File Pickup Source" doc:id="38a9e517-0415-4586-a8f6-a1317a420100" config-ref="MFT_Source_Config">
 			<scheduling-strategy >
 				<fixed-frequency frequency="3000" />
 			</scheduling-strategy>
 		</mft:file-pickup-source>
 		<set-variable value="#[attributes.fileCode]" doc:name="Set Variable" doc:id="e2a397de-ad70-4a97-95b5-be682bca67c8" variableName="fileCode"/>
-		<mft:file-dropoff fileSize="#[attributes.fileSize]" doc:name="File Dropoff" doc:id="68ba4cf9-1301-4c44-9c07-fd0ac0b8279d" config-ref="MFT_Target_Config" filename="#[attributes.fileName]" />
+		<set-variable value="#[payload]" doc:name="Set Variable" doc:id="be307b8f-0d19-4380-888d-ec048d667cf8" variableName="origpayload"/>
+		<ee:transform doc:name="Transform Message" doc:id="72b5a342-4f43-4200-b99a-d069e0f8ebd4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+zipFileName: attributes.fileName! ++ ".gzip"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload.zipFileName]" doc:name="Set Variable" doc:id="137740da-3b08-42fc-b217-49204b248aad" variableName="zipfilename" />
+		<compression:compress doc:name="Compress" doc:id="a5faea64-1e14-4d17-905c-58ed5ef9dad3">
+			<compression:content ><![CDATA[#[vars.origpayload]]]></compression:content>
+			<compression:compressor>
+				<compression:gzip-compressor />
+			</compression:compressor>
+		</compression:compress>
+		<mft:file-dropoff fileSize="#[sizeOf(payload)]" doc:name="File Dropoff" doc:id="68ba4cf9-1301-4c44-9c07-fd0ac0b8279d" config-ref="MFT_Target_Config" filename='#[vars.zipfilename]' >
+		</mft:file-dropoff>
 		<ee:transform doc:name="Transform Message" doc:id="e7f5f252-6a20-4a9e-9683-b8d96b5fe594">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
@@ -40,7 +66,7 @@ output application/java
 output application/json
 ---
 {
-	userName: "thruSupport",
+	userName: "ThruSupport",
 	fileName: payload.fileName,
 	fileCode: payload.fileCode,
 	fileSize: payload.fileSize,
@@ -50,5 +76,20 @@ output application/json
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="82d1637d-790d-4bfc-a312-20374f2fa2d7" message="&gt;&gt;&gt;&gt; DATAWEAVE -  Current user: #[payload.userName], fileName: #[payload.fileName], fileSize: #[payload.fileSize], fileCode: #[payload.fileCode], date: #[payload.fileDate]"/>
 		<mft:flow-outcome doc:name="Flow Outcome" doc:id="0a03cb45-5f4b-4e9a-8097-aa9da6e36827" config-ref="MFT_Source_Config" fileCode="#[vars.fileCode]" status="PASSED" flowInstanceCode="#[vars.fileCode]" />
+	</flow>
+	<flow name="mule-thru-mft-connector-crud-operation-demoFlow1" doc:id="e631dbe2-161a-42a2-820e-a220056027a4" initialState="stopped">
+		<scheduler doc:name="Scheduler" doc:id="69b6986d-fb53-4feb-9c1e-9c8dd9d9a253" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="20" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<http:request method="POST" doc:name="Request" doc:id="5334e46c-2f5d-48ae-969e-37829bbdecfa" outputMimeType="application/json" sendBodyMode="ALWAYS" config-ref="HTTP_Request_configuration" url="https://mftdevapi0011.thruinc.com/api/trsvc/ActivityList">
+			<http:body ><![CDATA[{"PageNumber": 1,"PageSize": 10}]]></http:body>
+			<http:headers ><![CDATA[#[output application/java
+---
+{
+	"Authorization" : "TrSvcAreaAuthHeader 4KMAVZjcd5J7s2ez9/W2BKBca1m7tuGg/OEZ+Ey1P3V00uuGjBoli9vL8EOOxD4hrrf40vPQJ2zK1fWq4krXJXstZgRFkoPUTrZFfIxaJxRAneYHy0LYb1+U3oZ+SI2KkAVmrpxdeI/DFYb87dGtH6gybIgm3Bejhyvr12Rq3Dch26CBtyxEtw=="
+}]]]></http:headers>
+		</http:request>
 	</flow>
 </mule>
