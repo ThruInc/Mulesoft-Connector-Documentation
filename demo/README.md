@@ -39,6 +39,9 @@ In order to build and run this demo project you need:
 	* Select Mule Runtime (4.x.x EE).
 	* Click **Finish**.
 
+* Update Configuration
+	* Enter connection specific information in src/main/resources/mule-thru-demo.properties
+	
 * Run the Mule Project.
 
 ### Configuration Note
