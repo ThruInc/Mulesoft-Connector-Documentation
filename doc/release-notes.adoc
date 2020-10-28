@@ -23,7 +23,7 @@ link:user-manual.adoc[Thru MFT Connector User Guide]
 Points to the docs.mulesoft pages for documentation on the functional aspects of the connector. e.g.: link:/mule-user-guide/v/3.7/microsoft-sharepoint-2013-connector[Microsoft SharePoint 2013 Connector]
 ////
 
-== Thru MFT 2.0.2 - May 2020
+== Thru MFT 2.0.2 - Oct 2020
 ////
 <Release_date> : The date on which the connector is released (not when the notes are written, mind you)
 ////
@@ -40,9 +40,14 @@ Thru MFT Connector 2.0.2 is compatible with all currently deployed versions of T
 |===
 
 === Version 2.0.2:  Changes in this Release
-- Fixed an issue with the fileDropOff operation where the HTTP threads were not being stopped.
+=== New Features
+- Added web proxy support
+- Configurable HTTP timeout
 - Changed logging at the INFO level to only show messages for processed files. I.e. logging for filePickup cron job executions where no file is picked up have been removed.
 - Changed logging at the DEBUG level to log all entry and exist point executions.
+
+=== Defects Fixed
+- Fixed an issue with the fileDropOff operation where the HTTP threads were not being stopped.
 
 == Thru MFT 2.0.1 - February 2019
 ////
