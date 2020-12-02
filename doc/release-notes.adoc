@@ -22,6 +22,26 @@ link:user-manual.adoc[Thru MFT Connector User Guide]
 ////
 Points to the docs.mulesoft pages for documentation on the functional aspects of the connector. e.g.: link:/mule-user-guide/v/3.7/microsoft-sharepoint-2013-connector[Microsoft SharePoint 2013 Connector]
 ////
+== Thru MFT 2.1.0 - Dec 2020
+////
+<Release_date> : The date on which the connector is released (not when the notes are written, mind you)
+////
+
+=== Version 2.1.0 Compatibility
+
+Thru MFT Connector 2.1.0 is compatible with all currently deployed versions of Thru MFT service.
+
+[width="100%", cols=",", options="header"]
+|===
+|Software |Version
+|Mule Runtime |4.0, 4.1, 4.2, 4.3
+|Thru MFT Service |4.84
+|===
+
+=== Version 2.1.0:  Changes in this Release
+=== New Features
+- Added file pickup (mid flow) operation back.
+- Added HTTP retries for all API requests.
 
 == Thru MFT 2.0.2 - Oct 2020
 ////
