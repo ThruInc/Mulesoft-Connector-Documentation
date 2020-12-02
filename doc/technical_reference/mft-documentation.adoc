@@ -43,7 +43,7 @@ Default configuration
 |======================
 | Name | Type | Description | Default Value | Required
 | API Url a| String |  +++Thru API server address responsible for connector operations. This is the URL for the endpoint that is configured to handle connector requests.+++ |  | *x*{nbsp}
-| StorageRepository a| String |  +++Specify the Thru server endpoint.+++ |  | *x*{nbsp}
+| Storage Repository a| String |  +++Specify the Thru server endpoint.+++ |  | *x*{nbsp}
 | Site Key a| String |  +++Thru site access key.+++ |  | *x*{nbsp}
 | Flow Secret a| String |  +++Your flow's secret key+++ |  | *x*{nbsp}
 | Connection Timeout a| Number |  +++The connection timeout in ms+++ |  | *x*{nbsp}
@@ -59,6 +59,7 @@ Default configuration
 * <<Flow-Outcome>> {nbsp}
 * <<file-dropoff>> {nbsp}
 * <<file-metadata>> {nbsp}
+* <<file-pickup>> {nbsp}
 
 ==== Associated Sources
 * <<file-pickup-source>> {nbsp}
@@ -100,8 +101,8 @@ Send outcome information for a file with flow execution result status
 * MFT:UNABLE_TO_CONNECT {nbsp}
 * MFT:CONNECTIVITY {nbsp}
 * MFT:UNKNOWN_SERVER {nbsp}
-* MFT:INVALID_PARAMETER {nbsp}
 * MFT:TIMEOUT {nbsp}
+* MFT:INVALID_PARAMETER {nbsp}
 * MFT:RETRY_EXHAUSTED {nbsp}
 * MFT:ENTITY_NOT_FOUND {nbsp}
 * MFT:PICKUP_INVALID_FILE_NAME {nbsp}
@@ -151,8 +152,8 @@ Upload file to Thru server.
 * MFT:UNABLE_TO_CONNECT {nbsp}
 * MFT:CONNECTIVITY {nbsp}
 * MFT:UNKNOWN_SERVER {nbsp}
-* MFT:INVALID_PARAMETER {nbsp}
 * MFT:TIMEOUT {nbsp}
+* MFT:INVALID_PARAMETER {nbsp}
 * MFT:RETRY_EXHAUSTED {nbsp}
 * MFT:ENTITY_NOT_FOUND {nbsp}
 * MFT:PICKUP_INVALID_FILE_NAME {nbsp}
@@ -195,8 +196,55 @@ Requests the file's information.
 * MFT:UNABLE_TO_CONNECT {nbsp}
 * MFT:CONNECTIVITY {nbsp}
 * MFT:UNKNOWN_SERVER {nbsp}
-* MFT:INVALID_PARAMETER {nbsp}
 * MFT:TIMEOUT {nbsp}
+* MFT:INVALID_PARAMETER {nbsp}
+* MFT:RETRY_EXHAUSTED {nbsp}
+* MFT:ENTITY_NOT_FOUND {nbsp}
+* MFT:PICKUP_INVALID_FILE_NAME {nbsp}
+* MFT:UNABLE_BUILD_AUTH_HEADER {nbsp}
+* MFT:UNKNOWN_CLIENT {nbsp}
+
+
+[[file-pickup]]
+=== File Pickup
+`<mft:file-pickup>`
+
++++
+Pickup file from Thru server.
++++
+
+==== Parameters
+[cols=".^20%,.^20%,.^35%,.^20%,^.^5%", options="header"]
+|======================
+| Name | Type | Description | Default Value | Required
+| Configuration | String | The name of the configuration to use. | | *x*{nbsp}
+| Streaming Strategy a| * <<repeatable-in-memory-stream>>
+* <<repeatable-file-store-stream>>
+* <<non-repeatable-stream>> |  +++Configure if repeatable streams should be used and their behaviour+++ |  | {nbsp}
+| Target Variable a| String |  +++The name of a variable on which the operation's output will be placed+++ |  | {nbsp}
+| Target Value a| String |  +++An expression that will be evaluated against the operation's output and the outcome of that expression will be stored in the target variable+++ |  +++#[payload]+++ | {nbsp}
+| Reconnection Strategy a| * <<reconnect>>
+* <<reconnect-forever>> |  +++A retry strategy in case of connectivity errors+++ |  | {nbsp}
+|======================
+
+==== Output
+[cols=".^50%,.^50%"]
+|======================
+| *Type* a| Binary
+| *Attributes Type* a| <<MFTFileAttributes>>
+|======================
+
+==== For Configurations.
+* <<config>> {nbsp}
+
+==== Throws
+* MFT:INVALID_AUTH_CREDENTIALS {nbsp}
+* MFT:UNABLE_TO_PICKUP {nbsp}
+* MFT:UNABLE_TO_CONNECT {nbsp}
+* MFT:CONNECTIVITY {nbsp}
+* MFT:UNKNOWN_SERVER {nbsp}
+* MFT:TIMEOUT {nbsp}
+* MFT:INVALID_PARAMETER {nbsp}
 * MFT:RETRY_EXHAUSTED {nbsp}
 * MFT:ENTITY_NOT_FOUND {nbsp}
 * MFT:PICKUP_INVALID_FILE_NAME {nbsp}
