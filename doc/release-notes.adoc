@@ -9,7 +9,7 @@ The following is the approved connector release notes template for documenting M
 :keywords: Thru, MFT
 
 
-Thru MFT Connector for MuleSoft Anypoint Studio is an out-of-the-box connector to implement file exchange with external and internal organizations for your Mule Flows. The connector enables Thru MFT as a service (MFTaaS) cloud platform to a solution based on Mule ESB. Thru MFT cloud service implements the following features for the MuleSoft - based enterprise solutions:
+Thru MFT Connector for MuleSoft Anypoint Studio is an out-of-the-box connector to implement file exchange with external and internal organizations for your Mule Flows. The connector enables Thru MFT as a service (MFTaaS) cloud platform to a solution based on MuleSoft Integration Platform. Thru MFT cloud service implements the following features for the MuleSoft - based enterprise solutions:
 
 - Reliable file exchange between organizations and Mule flows with audit, alerts and business continuity
 - Partner Management with subscriptions, self - management, reusable endpoints and support, out of the box protocol and API connectors.
@@ -18,10 +18,32 @@ Thru MFT Connector for MuleSoft Anypoint Studio is an out-of-the-box connector t
 - Scalable and secure REST API for Mule and other connectors
 - Developer environment
 
-link:user-manual.adoc[Thru MFT Connector User Guide]
+link:https://guides.thruinc.com/tmcfmug/[Thru MFT Connector for MuleSoft User Guide]
 ////
 Points to the docs.mulesoft pages for documentation on the functional aspects of the connector. e.g.: link:/mule-user-guide/v/3.7/microsoft-sharepoint-2013-connector[Microsoft SharePoint 2013 Connector]
 ////
+
+== Thru MFT 2.2.0 - Mar 2025
+////
+<Release_date> : The date on which the connector is released (not when the notes are written, mind you)
+////
+
+=== Version 2.2.0 Compatibility
+
+- Thru MFT Connector 2.2.0 is compatible with all currently deployed versions of Thru MFT service.
+- Thru MFT Connector 2.2.0 is compatible with Java 17.
+
+[width="100%", cols=",", options="header"]
+|===
+|Software |Version
+|Mule Runtime |4.3 or later
+|Thru MFT Service | NextGen(v2) service
+|===
+
+=== Version 2.2.0:  Changes in this Release
+=== Enhancements
+- Compatibility with Java 17.
+
 == Thru MFT 2.1.0 - Dec 2020
 ////
 <Release_date> : The date on which the connector is released (not when the notes are written, mind you)
@@ -135,7 +157,9 @@ If you’re currently using a connector version <old_connector_version_2> this c
 
 === Features
 
-See link:user-manual.adoc[Thru MFT Connector User Guide]
+See link:https://guides.thruinc.com/tmcfmug/[Thru MFT Connector for MuleSoft User Guide]
+
+
 
 // . <Feature_Title> - A description of the feature
 
@@ -170,6 +194,6 @@ See link:user-manual.adoc[Thru MFT Connector User Guide]
 ////
 could also be named See Also
 ////
-* Learn how to link:https://docs.mulesoft.com/anypoint-studio/v/7.1/add-modules-in-studio-to[Install Anypoint Connectors] from Anypoint Exchange in Studio 7.
-* Access MuleSoft’s MuleForge link:http://forum.mulesoft.org/mulesoft[Forum] to pose questions and get help from Mule’s broad community of users.
-* To access MuleSoft’s expert support team, link:https://www.mulesoft.com/support-and-services/mule-esb-support-license-subscription[subscribe] to Mule ESB Enterprise and log in to MuleSoft’s link:http://www.mulesoft.com/support-login[Customer Portal].
+* Learn how to link:https://docs.mulesoft.com/studio/latest/add-modules-in-studio-to[Install Anypoint Connectors] from Anypoint Exchange in Studio 7.
+* Access link:https://www.mulesoft.com/community[MuleSoft Community] to pose questions and get help from Mule’s broad community of users.
+* To access MuleSoft expert support team, visit link:https://help.mulesoft.com/s/[Forums] or open link:https://help.mulesoft.com/s/support[Support Case].
