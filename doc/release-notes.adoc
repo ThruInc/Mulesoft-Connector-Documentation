@@ -23,6 +23,26 @@ link:https://guides.thruinc.com/tmcfmug/[Thru MFT Connector for MuleSoft User Gu
 Points to the docs.mulesoft pages for documentation on the functional aspects of the connector. e.g.: link:/mule-user-guide/v/3.7/microsoft-sharepoint-2013-connector[Microsoft SharePoint 2013 Connector]
 ////
 
+== Thru MFT 2.2.1 - Apr 2025
+////
+<Release_date> : The date on which the connector is released (not when the notes are written, mind you)
+////
+
+=== Version 2.2.1 Compatibility
+
+- Thru MFT Connector 2.2.1 is compatible with all currently deployed versions of Thru MFT service.
+- Thru MFT Connector 2.2.1 is compatible with Java 17.
+
+[width="100%", cols=",", options="header"]
+|===
+|Software |Version
+|Mule Runtime |4.3 or later
+|Thru MFT Service | NextGen(v2) service
+|===
+
+=== Version 2.2.1:  Changes in this Release
+- Detailed logging is moved from Info to Debug log level. 
+
 == Thru MFT 2.2.0 - Mar 2025
 ////
 <Release_date> : The date on which the connector is released (not when the notes are written, mind you)
